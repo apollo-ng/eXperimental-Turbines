@@ -24,7 +24,7 @@ use <naca4.scad>
 
 Length 		= 150;		// Maximum build hight for the components
 Base 			= 60;		// blade width
-Radius 			= 100;		// Support Radius
+Radius 			= 95;		// Support Radius
 
 Camber 		= 0;		// Negative Camber creates inwards force on the blades at speed.
 Position 		= 0;		// Position has no influence if Camber is Zero
@@ -36,7 +36,11 @@ Reinforcement	= 0;		// 1 to add reinforcement, 0 for solid blade
 GapSize		= 0.08;
 
 Support_Tabs 	= 0;		// 1 to enable printing support tabs for raftless printing.
+Support_Ring 	= 1;		// 1 to enable printing support ring
 Tab_Thickness 	= 0.35;		// Tab thickness in mm
+
+
+
 
 Savonius_Starter = 0;	// 1 to use a savonius turbine to facilitate starting.  Starter will be situated in the Top section.
 
@@ -184,6 +188,12 @@ module wing_support(hs_radius, hs_support){
 
 
 module helical_wing_base(hb_length, hb_base, hb_radius, hb_twist=-60, hb_support = 8.01) { 
+	difference(){
+		cylinder(r=hb_radius*1.07, h=Tab_Thickness);
+		translate([0,0,-Tab_Thickness]){
+			cylinder(r=hb_radius*0.95, h=Tab_Thickness*3);
+		}
+	}
 	helical_wing(hb_length, hb_base, hb_radius, h_twist = hb_twist, guide_hole = Guide_hole, Tabs = Support_Tabs);
 	rotate([0,0,120])
 		helical_wing(hb_length/3*2, hb_base, hb_radius, h_twist = hb_twist/3*2, guide_hole = Guide_hole, Tabs = Support_Tabs);
