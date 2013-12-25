@@ -22,13 +22,13 @@ use <naca4.scad>
 //* Global parameters for the Turbine below...                       *
 //************************************************
 
-Length 		= 100;		// Maximum build hight for the components
-Base 			= 50;		// blade width
-Radius 			= 80;		// Support Radius
+Length 		= 150;		// Maximum build hight for the components
+Base 			= 60;		// blade width
+Radius 			= 100;		// Support Radius
 
 Camber 		= 0;		// Negative Camber creates inwards force on the blades at speed.
 Position 		= 0;		// Position has no influence if Camber is Zero
-Thickness 		= 15;		// Thickness of profile
+Thickness 		= 18;		// Thickness of profile
 
 Guide_hole 	= 4;		// mm Diameter of the guide hole in the blade
 
@@ -36,7 +36,7 @@ Reinforcement	= 0;		// 1 to add reinforcement, 0 for solid blade
 GapSize		= 0.08;
 
 Support_Tabs 	= 0;		// 1 to enable printing support tabs for raftless printing.
-Tab_Thickness 	= 1;		// Tab thickness in mm
+Tab_Thickness 	= 0.35;		// Tab thickness in mm
 
 Savonius_Starter = 0;	// 1 to use a savonius turbine to facilitate starting.  Starter will be situated in the Top section.
 
@@ -52,9 +52,7 @@ Savonius_Starter = 0;	// 1 to use a savonius turbine to facilitate starting.  St
 	Atomic, inverted no shaft = 8
 */
 
-Module = 8;
-
-
+Module = 4;
 
 // *****************************Modules************************************
 
@@ -130,13 +128,15 @@ module helical_wing(h_length, h_base,h_radius,h_twist = -60, tab_position =1, gu
 				}
 	if (Tabs){
 		if (tab_position == 1){	
-			translate([h_base/2.2,h_radius,0])
-				cylinder (r=5, h=Tab_Thickness, $fn=20);
+			translate([h_base/2.2+5,h_radius,0])
+				cylinder (r=10, h=Tab_Thickness, $fn=20);
+			translate([h_base/2.2-50,h_radius,0])
+				cylinder (r=10, h=Tab_Thickness, $fn=20);
 		}
 		else {
 			rotate([0,0,-h_twist])
 				translate([h_base/2.2,h_radius,h_length-Tab_Thickness])
-					cylinder (r=5, h=Tab_Thickness, $fn=20);
+					cylinder (r=10, h=Tab_Thickness, $fn=20);
 		}
 	}
 }
@@ -174,7 +174,7 @@ module wing_support(hs_radius, hs_support){
 					cylinder(r=hs_support/10, $fn=12);
 			}
 			
-			translate([hs_support/4,hs_radius-(hs_support*(0.4+Camber*-.05)),hs_support/5])	
+			translate([hs_support/4,hs_radius-(hs_support*(0.4+Camber*-.05))-1.5,hs_support/5])	
 			    	minkowski(){
 					cube([hs_support*1.5, hs_support / 8, hs_support/8]);
 					sphere(r=hs_support/5, $fn=12);
@@ -184,11 +184,11 @@ module wing_support(hs_radius, hs_support){
 
 
 module helical_wing_base(hb_length, hb_base, hb_radius, hb_twist=-60, hb_support = 8.01) { 
-	helical_wing(hb_length, hb_base, hb_radius, h_twist = hb_twist, guide_hole = Guide_hole, Tabs = 1);
+	helical_wing(hb_length, hb_base, hb_radius, h_twist = hb_twist, guide_hole = Guide_hole, Tabs = Support_Tabs);
 	rotate([0,0,120])
-		helical_wing(hb_length/3*2, hb_base, hb_radius, h_twist = hb_twist/3*2, guide_hole = Guide_hole, Tabs = 1);
+		helical_wing(hb_length/3*2, hb_base, hb_radius, h_twist = hb_twist/3*2, guide_hole = Guide_hole, Tabs = Support_Tabs);
 	rotate([0,0,240])
-		helical_wing(hb_length/3, hb_base, hb_radius, h_twist = hb_twist/3, guide_hole = Guide_hole, Tabs = 1);
+		helical_wing(hb_length/3, hb_base, hb_radius, h_twist = hb_twist/3, guide_hole = Guide_hole, Tabs = Support_Tabs);
 	
 	 difference(){
 	    	union(){
