@@ -1,7 +1,7 @@
 axis_dia = 12;
 connector_width = 20;
 connector_height = 2;
-connector_length = 200;
+connector_length = 177;
 base_height = 8;
 bearing_d1 = 30;
 bearing_d2 = 55;
@@ -37,7 +37,7 @@ module center_top() {
 }
 
 
-module center_middle_cover() {
+module center_middle_cover(axis_d) {
 	difference() {
 		union() {
 			translate([0,0,bearing_h])
@@ -68,11 +68,12 @@ module center_middle_cover() {
 						cylinder(r=1.5,h=base_height+10);
 				}
 			}
-		cylinder(r=bearing_d1/2,h=100);
+		cylinder(r=axis_d/2,h=100);
 	}
 }
 
-module center_middle() {
+
+module center_middle(axis_d) {
 	difference() {
 		union() {
 			difference() {
@@ -100,8 +101,7 @@ module center_middle() {
 			
 		}
 		translate([0,0,-0.05])
-			cylinder(r=bearing_d2/2,h=bearing_h+0.1);
-		cylinder(r=bearing_d1/2,h=100);
+			cylinder(r=axis_d/2,h=bearing_h+0.1);
 	}
 }
 
@@ -109,7 +109,7 @@ module connectors(){
 	rotate(60)
 		for(rotation=[0,120,240]){
 			rotate(rotation)
-				translate([0,120,base_height-connector_height+1])
+				translate([0,120,bearing_h-connector_height+1])
 					cube([connector_width,connector_length,2],center=true);
 		}
 }
@@ -118,24 +118,45 @@ module wings(){
 	rotate(60)
 		for(rotation=[0,120,240]){
 			rotate(rotation)
-				translate([0,190,-350])
-					cylinder(h=550,r=40);
+				translate([0,0,-350])
+						linear_extrude(height = 550, twist=120) 
+								translate([100,160,0])
+									rotate(70)
+										import("lenz_profile.dxf");	
 		}
 }
 
-center_top();
-color([0,1,0])
-	connectors();
+module axis(){
+	translate([0,0,-800]){
+		difference() {
+			cylinder(h=800,r=30/2);
+			translate([0,0,-0.1])
+				cylinder(h=801,r=30/2-3);
+			}
+		cylinder(h=830,r=axis_dia/2);
+	}
+}
 
-translate([0,0,-190]){
-	center_middle();
+rotate(20){
 	color([1,0,1])
-		center_middle_cover();
-	color([0,1,0])
+		center_middle_cover(axis_dia*3);
+	center_middle(axis_dia);
+	color([0,1,0,0.5])
 		connectors();
 }
 
-wings();
+rotate(60){
+	translate([0,0,-190]){
+		center_middle(bearing_d2);
+		color([1,0,1])
+			center_middle_cover(bearing_d1+2);
+		color([0,1,0,0.5])
+			connectors();
+	}
+}
 
-translate([0,0,-800])
-	cylinder(h=800,r=30/2);
+wings();
+color([0,1,0,0.5])
+	axis();
+
+
